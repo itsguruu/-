@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LUNA Pairing</title>
+  <style>
+    body { font-family: Arial; padding: 50px; background: #f0f0f0; }
+    .container { background: white; padding: 30px; border-radius: 8px; text-align: center; }
+    input, button { padding: 10px; margin: 10px 0; width: 200px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 LUNA Pairing</h1>
+    <input type="text" id="number" placeholder="Enter WhatsApp number" />
+    <button onclick="getCode()">Get Pairing Code</button>
+    <p id="codeDisplay"></p>
+    <button id="copyBtn" style="display:none;" onclick="copyCode()">Copy Code</button>
+  </div>
+
+  <script>
+    async function getCode() {
+      const number = document.getElementById("number").value;
+      if (!number) return alert("Enter number!");
+      const res = await fetch(`/code?number=${number}`);
+      const data = await res.json();
+      document.getElementById("codeDisplay").innerText = `Code: ${data.code}`;
+      const copyBtn = document.getElementById("copyBtn");
+      copyBtn.style.display = "inline-block";
+      copyBtn.dataset.code = data.code;
+    }
+
+    function copyCode() {
+      const code = document.getElementById("copyBtn").dataset.code;
+      navigator.clipboard.writeText(code);
+      alert("✅ Code copied!");
+    }
+  </script>
+</body>
+</html>
