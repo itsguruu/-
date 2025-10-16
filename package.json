@@ -1,28 +1,16 @@
 {
   "name": "luna-pairing-server",
   "version": "1.0.0",
-  "description": "🌙 LUNA WhatsApp Pairing Server by @itsguruu",
-  "main": "pair.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node pair.js"
+    "start": "node index.js"
   },
-  "keywords": [
-    "whatsapp",
-    "baileys",
-    "pairing",
-    "bot",
-    "luna",
-    "itsguruu"
-  ],
-  "author": "itsguruu",
-  "license": "MIT",
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.6.0",
+    "@whiskeysockets/baileys": "^6.0.0",
     "express": "^4.18.2",
-    "pino": "^8.15.0"
-  },
-  "engines": {
-    "node": ">=18.x"
+    "pino": "^8.14.1",
+    "qrcode": "^1.5.1",
+    "body-parser": "^1.20.2"
   }
 }
