@@ -1,21 +1,21 @@
 {
-  "name": "LUNA Pairing Link",
-  "description": "A WhatsApp pairing server for SILENT-LUNA bot",
+  "name": "lunapair",
+  "description": "LUNA Bot WhatsApp Pairing Server",
   "repository": "https://github.com/itsguruu/Lunapair",
-  "keywords": ["whatsapp", "bot", "baileys", "pairing", "LUNA"],
+  "logo": "https://raw.githubusercontent.com/itsguruu/Lunapair/main/logo.png",
+  "keywords": ["whatsapp", "bot", "luna", "pairing"],
   "buildpacks": [
     {
       "url": "heroku/nodejs"
     }
   ],
   "env": {
-    "NODE_ENV": {
-      "description": "Set environment to production",
-      "value": "production"
-    },
     "PORT": {
       "description": "Port for the server",
-      "value": "8000"
+      "value": "3000"
     }
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
