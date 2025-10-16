@@ -1,75 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SILENT-LUNA Pairing</title>
+  <meta charset="UTF-8">
+  <title>LUNA Pairing</title>
   <style>
-    body {
-      background: #0d1117;
-      color: #c9d1d9;
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-    input {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      margin: 10px 0;
-      width: 80%;
-      font-size: 16px;
-    }
-    button {
-      background: #238636;
-      border: none;
-      color: white;
-      padding: 10px 25px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #2ea043;
-    }
-    h1 {
-      color: #58a6ff;
-      margin-bottom: 15px;
-    }
-    footer {
-      margin-top: 30px;
-      font-size: 13px;
-      color: #8b949e;
-    }
+    body { font-family: Arial; text-align: center; padding: 50px; }
+    input, button { padding: 10px; font-size: 16px; margin: 5px; }
   </style>
 </head>
 <body>
-  <h1>💫 SILENT-LUNA Pairing System</h1>
-  <p>Enter your WhatsApp number below to generate your secure pairing code:</p>
-  <input type="text" id="number" placeholder="e.g. 254712345678" />
-  <button onclick="generateCode()">Generate Code</button>
-  <p id="response"></p>
-
-  <footer>Developed by <strong>itsguruu</strong> 🪄</footer>
+  <h1>💫 LUNA Pairing</h1>
+  <p>Enter your number to generate a pairing code:</p>
+  <input id="number" type="text" placeholder="2547XXXXXXX">
+  <button onclick="generateCode()">Generate</button>
 
   <script>
-    async function generateCode() {
-      const number = document.getElementById("number").value.trim();
-      const responseEl = document.getElementById("response");
-      responseEl.textContent = "Generating code... Please wait 🌙";
-
-      try {
-        const res = await fetch(`/pair?number=${number}`);
-        const text = await res.text();
-        responseEl.textContent = text;
-      } catch (err) {
-        responseEl.textContent = "❌ Failed to connect. Please try again.";
-      }
+    function generateCode() {
+      const num = document.getElementById("number").value;
+      if (!num) return alert("Please enter your number!");
+      window.location.href = `/code?number=${num}`;
     }
   </script>
 </body>
