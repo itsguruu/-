@@ -5,7 +5,7 @@
   <title>LUNA Pairing Code</title>
   <style>
     body { font-family: Arial; text-align: center; padding: 50px; }
-    input { padding: 10px; font-size: 16px; width: 200px; text-align: center; }
+    input { padding: 10px; font-size: 16px; width: 250px; text-align: center; }
     button { padding: 10px; font-size: 16px; margin-top: 10px; }
   </style>
 </head>
@@ -19,16 +19,24 @@
     async function fetchCode() {
       const urlParams = new URLSearchParams(window.location.search);
       const number = urlParams.get("number");
-      if (!number) return;
-      const response = await fetch(`/code?number=${number}`);
-      document.getElementById("code").value = "Check console for code (Background pairing)";
+      if (!number) return alert("Number missing!");
+
+      try {
+        const response = await fetch(`/code?number=${number}`);
+        const data = await response.json();
+        if (data.error) return alert(data.error);
+        document.getElementById("code").value = data.code;
+      } catch (err) {
+        document.getElementById("code").value = "Error generating code";
+        console.error(err);
+      }
     }
 
     function copyCode() {
       const codeInput = document.getElementById("code");
       codeInput.select();
-      document.execCommand("copy");
-      alert("Code copied to clipboard!");
+      navigator.clipboard.writeText(codeInput.value);
+      alert("✅ Code copied to clipboard!");
     }
 
     fetchCode();
