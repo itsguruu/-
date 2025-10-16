@@ -1,45 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>LUNA Pairing Code</title>
-  <style>
-    body { font-family: Arial; text-align: center; padding: 50px; }
-    input { padding: 10px; font-size: 16px; width: 250px; text-align: center; }
-    button { padding: 10px; font-size: 16px; margin-top: 10px; }
-  </style>
+  <title>LUNA Pairing</title>
 </head>
 <body>
-  <h1>🔐 Your LUNA Pairing Code</h1>
-  <input id="code" type="text" value="Generating..." readonly>
-  <br>
+  <h2>LUNA Pairing</h2>
+  <input type="text" id="code" readonly>
   <button onclick="copyCode()">Copy Code</button>
 
   <script>
-    async function fetchCode() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const number = urlParams.get("number");
-      if (!number) return alert("Number missing!");
-
-      try {
-        const response = await fetch(`/code?number=${number}`);
-        const data = await response.json();
-        if (data.error) return alert(data.error);
-        document.getElementById("code").value = data.code;
-      } catch (err) {
-        document.getElementById("code").value = "Error generating code";
-        console.error(err);
-      }
+    async function getCode() {
+      const number = prompt("Enter your number with country code:");
+      const response = await fetch(`/code?number=${number}`);
+      const data = await response.json();
+      document.getElementById("code").value = data.code;
+      alert("Pairing code displayed! Session ID will be sent to your WhatsApp inbox after linking.");
     }
 
     function copyCode() {
       const codeInput = document.getElementById("code");
       codeInput.select();
+      codeInput.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(codeInput.value);
-      alert("✅ Code copied to clipboard!");
+      alert("✅ Code copied!");
     }
 
-    fetchCode();
+    getCode();
   </script>
 </body>
 </html>
