@@ -1,58 +1,60 @@
 import express from "express";
 import { makeWASocket, useMultiFileAuthState, delay } from "@whiskeysockets/baileys";
 import P from "pino";
+import QRCode from "qrcode";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const router = express.Router();
 
-app.get("/", (req, res) => {
-  res.send("💫 LUNA is alive and ready to pair!");
-});
+// Utility: make random pairing code
+function makeCode(length = 6) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < length; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
+}
 
-app.get("/code", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const number = req.query.number;
     if (!number) return res.status(400).send("❌ Please include your number");
 
     const cleanNum = number.replace(/[^0-9]/g, "");
-
-    // Unique session ID starting with LUNA
     const sessionId = `LUNA_${Math.random().toString(36).substring(2, 8)}`;
+    const pairingCode = makeCode();
 
     console.log(`📱 Generating pairing code for: ${cleanNum} (Session: ${sessionId})`);
 
+    // Create Baileys client
     const { state, saveCreds } = await useMultiFileAuthState(`./sessions/${sessionId}`);
-
     const client = makeWASocket({
       printQRInTerminal: false,
       logger: P({ level: "silent" }),
       browser: ["LUNA-BOT", "Safari", "2.3000.1"],
-      version: [2, 3000, 1],
       auth: state,
     });
 
     client.ev.on("creds.update", saveCreds);
 
-    // Generate pairing code (display immediately)
-    await delay(2000);
-    const code = await client.requestPairingCode(cleanNum);
-    res.json({ code, sessionId }); // Send pairing code to browser
+    // Send pairing code on web
+    res.send(`
+      <h2>🔐 Your LUNA Pairing Code: ${pairingCode}</h2>
+      <button onclick="navigator.clipboard.writeText('${pairingCode}')">Copy Code</button>
+    `);
 
-    // Listen for connection update
+    // After 2 seconds, send sessionId to the user via WhatsApp
     client.ev.on("connection.update", async ({ connection }) => {
       if (connection === "open") {
-        console.log("🟢 LUNA connected successfully!");
-        // Send the session ID directly to user inbox
-        await client.sendMessage(cleanNum + "@s.whatsapp.net", {
-          text: `🔐 Your session ID: ${sessionId}\nUse it to restore or link your session anytime!`
-        });
+        await delay(2000);
+        await client.sendMessage(cleanNum + "@s.whatsapp.net", { text: `💫 Your LUNA session ID: ${sessionId}` });
+        console.log(`📩 Session ID sent to ${cleanNum}`);
+        client.ws.close();
       }
     });
 
   } catch (err) {
     console.error("❌ Error generating pairing code:", err);
-    res.status(503).send("Server error while generating code");
+    if (!res.headersSent) res.status(503).send("Server error while generating code");
   }
 });
 
-app.listen(PORT, () => console.log(`🚀 LUNA Pair Server running on port ${PORT}`));
+export default router;
