@@ -3,13 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <title>LUNA Pairing</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+  input { width: 300px; padding: 10px; margin: 10px 0; font-size: 16px; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  .qr-img { margin: 20px 0; }
+</style>
 </head>
 <body>
 <h1>🔐 Generate Your LUNA Pairing Code</h1>
-<form action="/code" method="get">
-  <input type="text" name="number" placeholder="Enter your phone number" required>
+<form id="pairForm">
+  <input type="text" id="number" placeholder="Enter your phone number" required>
   <button type="submit">Generate</button>
 </form>
-<p>The QR code will appear here after submission.</p>
+
+<div id="result" style="display:none;">
+  <h3>Your LUNA Code:</h3>
+  <input type="text" id="pairCode" readonly>
+  <button id="copyBtn">Copy Code</button>
+  <div class="qr-img">
+    <img id="qrImage" alt="QR Code" />
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('pairForm');
+  const resultDiv = document.getElementById('result');
+  const pairCodeInput = document.getElementById('pairCode');
+  const qrImage = document.getElementById('qrImage');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const number = document.getElementById('number').value;
+
+    try {
+      const response = await fetch(`/code?number=${number}`);
+      if (!response.ok) throw new Error("Failed to generate code");
+
+      // If the server returns PNG QR, show it
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      qrImage.src = url;
+
+      // Extract code from QR for demonstration (optional: server can send code separately)
+      pairCodeInput.value = "Scan the QR or use code";
+
+      resultDiv.style.display = "block";
+    } catch (err) {
+      alert("❌ Error generating code: " + err.message);
+    }
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    pairCodeInput.select();
+    document.execCommand('copy');
+    alert("✅ Code copied to clipboard!");
+  });
+</script>
 </body>
 </html>
