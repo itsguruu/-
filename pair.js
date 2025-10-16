@@ -1,49 +1,58 @@
 import express from "express";
-import P from "pino";
 import { makeWASocket, useMultiFileAuthState, delay } from "@whiskeysockets/baileys";
-import fs from "fs";
+import P from "pino";
 
-const router = express.Router();
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-function makeid(num = 6) {
-  let result = "";
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  for (let i = 0; i < num; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-  return result;
-}
-
-router.get("/", async (req, res) => {
-  const number = req.query.number;
-  if (!number) return res.status(400).send({ error: "Please include your number" });
-
-  const cleanNum = number.replace(/[^0-9]/g, "");
-  const sessionId = `LUNA_${Math.random().toString(36).substring(2, 8)}`;
-  const code = makeid();
-
-  console.log(`📱 Generating pairing code for ${cleanNum} (Session: ${sessionId}) => ${code}`);
-
-  // Save code in a temporary file (optional)
-  fs.mkdirSync(`./sessions/${sessionId}`, { recursive: true });
-  fs.writeFileSync(`./sessions/${sessionId}/code.txt`, code);
-
-  // Return code immediately
-  res.send({ code, sessionId });
-
-  // Background pairing (optional)
-  const { state, saveCreds } = await useMultiFileAuthState(`./sessions/${sessionId}`);
-  const client = makeWASocket({
-    printQRInTerminal: false,
-    logger: P({ level: "silent" }),
-    browser: ["LUNA-BOT", "Safari", "2.3000.1"],
-    auth: state
-  });
-
-  client.ev.on("creds.update", saveCreds);
-
-  client.ev.on("connection.update", async ({ connection, lastDisconnect }) => {
-    if (connection === "open") console.log(`🟢 LUNA connected successfully: ${sessionId}`);
-    else if (connection === "close") console.log("⚠️ Connection closed, retrying...");
-  });
+app.get("/", (req, res) => {
+  res.send("💫 LUNA is alive and ready to pair!");
 });
 
-export default router;
+app.get("/code", async (req, res) => {
+  try {
+    const number = req.query.number;
+    if (!number) return res.status(400).send("❌ Please include your number");
+
+    const cleanNum = number.replace(/[^0-9]/g, "");
+
+    // Unique session ID starting with LUNA
+    const sessionId = `LUNA_${Math.random().toString(36).substring(2, 8)}`;
+
+    console.log(`📱 Generating pairing code for: ${cleanNum} (Session: ${sessionId})`);
+
+    const { state, saveCreds } = await useMultiFileAuthState(`./sessions/${sessionId}`);
+
+    const client = makeWASocket({
+      printQRInTerminal: false,
+      logger: P({ level: "silent" }),
+      browser: ["LUNA-BOT", "Safari", "2.3000.1"],
+      version: [2, 3000, 1],
+      auth: state,
+    });
+
+    client.ev.on("creds.update", saveCreds);
+
+    // Generate pairing code (display immediately)
+    await delay(2000);
+    const code = await client.requestPairingCode(cleanNum);
+    res.json({ code, sessionId }); // Send pairing code to browser
+
+    // Listen for connection update
+    client.ev.on("connection.update", async ({ connection }) => {
+      if (connection === "open") {
+        console.log("🟢 LUNA connected successfully!");
+        // Send the session ID directly to user inbox
+        await client.sendMessage(cleanNum + "@s.whatsapp.net", {
+          text: `🔐 Your session ID: ${sessionId}\nUse it to restore or link your session anytime!`
+        });
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Error generating pairing code:", err);
+    res.status(503).send("Server error while generating code");
+  }
+});
+
+app.listen(PORT, () => console.log(`🚀 LUNA Pair Server running on port ${PORT}`));
