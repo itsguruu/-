@@ -1,25 +1,23 @@
 import express from "express";
 import path from "path";
-import bodyParser from "body-parser";
-import codeRouter from "./pair.js";
+import { fileURLToPath } from "url";
+import pairRouter from "./pair.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve HTML files
-const __dirname = path.resolve();
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use("/code", codeRouter);
-
+// Root route
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/main.html");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.get("/pair", (req, res) => {
-  res.sendFile(__dirname + "/pair.html");
-});
+// Pairing route
+app.use("/code", pairRouter);
 
 app.listen(PORT, () => console.log(`🚀 LUNA Pair Server running on port ${PORT}`));
