@@ -12,5 +12,5 @@
 
 <h4 align="left">1. 𝐇𝐄𝐑𝐎𝐊𝐔</h4>
 <p align="left">
-<a href='://dashboard.herohttpsku.com/new?template=https://github.com/itsguruu/𝐋𝐔𝐍𝐀' target="_blank"><img alt='Heroku' src='https://img.shields.io/badge/-Heroku%20Deploy-purple?style=for-the-badge&logo=heroku&logoColor=white'/></a>
+<a href='://dashboard.herohttpsku.com/new?template=https://github.com/itsguruu/Lunapair' target="_blank"><img alt='Heroku' src='https://img.shields.io/badge/-Heroku%20Deploy-purple?style=for-the-badge&logo=heroku&logoColor=white'/></a>
 </p>
