@@ -1,16 +1,28 @@
 {
-  "name": "silent-luna-pair",
+  "name": "luna-pairing-server",
   "version": "1.0.0",
-  "description": "SILENT-LUNA WhatsApp Pairing Server",
-  "main": "index.js",
+  "description": "🌙 LUNA WhatsApp Pairing Server by @itsguruu",
+  "main": "pair.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node pair.js"
   },
+  "keywords": [
+    "whatsapp",
+    "baileys",
+    "pairing",
+    "bot",
+    "luna",
+    "itsguruu"
+  ],
+  "author": "itsguruu",
+  "license": "MIT",
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.8",
-    "body-parser": "^1.20.2",
-    "express": "^4.19.2",
-    "pino": "^9.3.1"
+    "@whiskeysockets/baileys": "^6.6.0",
+    "express": "^4.18.2",
+    "pino": "^8.15.0"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
