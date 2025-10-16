@@ -1,15 +1,17 @@
 {
   "name": "luna-pairing-server",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.0.0",
+    "@whiskeysockets/baileys": "^6.9.3",
     "express": "^4.18.2",
-    "pino": "^8.14.1",
+    "pino": "^8.12.0",
     "qrcode": "^1.5.1",
     "body-parser": "^1.20.2"
   }
